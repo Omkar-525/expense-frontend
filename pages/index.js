@@ -38,6 +38,7 @@ const AuthenticationForm = () => {
         if(isLogin){
           if (responseData.jwt) {
             localStorage.setItem('jwt', responseData.jwt);
+            localStorage.setItem('user', JSON.stringify(responseData.user));
           }
       
           router.push('/dashboard');

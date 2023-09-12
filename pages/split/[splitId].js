@@ -1,0 +1,443 @@
+import React, { useState, useEffect } from "react";
+import Nav from "../../components/nav";
+import { useRouter } from "next/router";
+import {
+  fetchSplitDetails,
+  addTransaction,
+  deleteTransaction,
+  addUserToSplit,
+  finalizeSplit,
+  fetchTransactionsOfSplit,
+  fetchDebtSummary,
+} from "../../api/split";
+import SearchUser from "../../components/split/searchUser";
+import axios from "axios";
+import DebtSummary from "../../components/split/DebtSummary";
+import { TrashIcon } from "@heroicons/react/solid"; // Import the trash icon
+
+const SplitDetailPage = () => {
+  const router = useRouter();
+  const { splitId } = router.query;
+
+  const [splitDetails, setSplitDetails] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [showAddTransactionModal, setShowAddTransactionModal] = useState(false);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [debtSummary, setDebtSummary] = useState([]);
+  const [consolidatedDebts, setConsolidatedDebts] = useState({});
+
+  // Fetch the current user from local storage (similarly to the CreateSplitModal component)
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setCurrentUser(parsedUser);
+    }
+  }, []);
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/category").then((response) => {
+      setCategories(response.data);
+    });
+  }, []);
+
+  const handleUserSelect = (user) => {
+    if (
+      user.id !== currentUser?.id &&
+      !selectedUsers.find((u) => u.id === user.id)
+    ) {
+      setSelectedUsers((prev) => [...prev, user]);
+    }
+  };
+  const handleRemoveUser = (id) => {
+    setSelectedUsers((prev) => prev.filter((user) => user.id !== id));
+  };
+
+  const handleAddUser = () => {
+    if (selectedUsers.length) {
+      const userIds = selectedUsers.map((user) => user.id);
+      addUserToSplit(splitId, { userIds }) // assuming the API needs an object with a userIds property
+        .then((response) => {
+          if (response.response_code === "200") {
+            setSelectedUsers([]); // clear selected users after adding
+            setShowAddUserModal(false); // close modal after adding
+            window.location.reload();
+          }
+        })
+        .catch((error) => {
+          setErrorMsg("Failed to add user. Please try again.");
+        });
+    }
+  };
+
+  const [newTransaction, setNewTransaction] = useState({
+    date: "",
+    type: "DEBIT",
+    amount: 0,
+    description: "",
+  });
+  const [errorMsg, setErrorMsg] = useState(""); // Error state
+
+  useEffect(() => {
+    if (splitId) {
+      fetchTransactionsOfSplit(splitId)
+        .then((data) => setTransactions(data.data))
+        .catch((error) => {
+          setErrorMsg("Failed to fetch transactions. Please try again.");
+          console.error("Failed to fetch transactions:", error);
+        });
+    }
+  }, [splitId]);
+
+  useEffect(() => {
+    if (splitId) {
+      fetchDebtSummary(splitId)
+        .then((data) => setDebtSummary(data.data))
+        .catch((error) => {
+          setErrorMsg("Failed to fetch Debt Summary. Please try again.");
+          console.error("Failed to fetch transactions:", error);
+        });
+    }
+  }, [splitId]);
+
+  useEffect(() => {
+    let consolidatedDebt = {};
+
+    debtSummary.forEach((creditorInfo) => {
+      creditorInfo.debts.forEach((debt) => {
+        if (consolidatedDebt[debt.debtor.name]) {
+          consolidatedDebt[debt.debtor.name] += debt.amount;
+        } else {
+          consolidatedDebt[debt.debtor.name] = debt.amount;
+        }
+      });
+    });
+
+    for (let debtor in consolidatedDebt) {
+      consolidatedDebt[debtor] = Math.round(consolidatedDebt[debtor]);
+    }
+    setConsolidatedDebts(consolidatedDebt);
+  }, [debtSummary]);
+
+  useEffect(() => {
+    if (splitId) {
+      fetchSplitDetails(splitId)
+        .then((data) => {
+          if (!data || typeof data !== "object") {
+            throw new Error(
+              "Received invalid data format from fetchSplitDetails. Expected an object."
+            );
+          }
+          setSplitDetails(data);
+        })
+        .catch((error) => {
+          setErrorMsg("Failed to fetch split details. Please try again.");
+          console.error("Failed to fetch split details:", error);
+        });
+    }
+  }, [splitId]);
+
+  const handleAddTransaction = () => {
+    const dateObject = new Date(newTransaction.date);
+    const formattedDate = `${String(dateObject.getDate()).padStart(
+      2,
+      "0"
+    )}-${dateObject
+      .toLocaleString("default", { month: "short" })
+      .toUpperCase()}-${dateObject.getFullYear()}`;
+    const category = categories.filter(
+      (category) => category.name === "Split"
+    )[0];
+
+    const requestData = {
+      ...newTransaction,
+      date: formattedDate,
+      category: category,
+    };
+
+    addTransaction(splitId, requestData)
+      .then((newTransaction) => {
+        setTransactions((prev) => [...prev, newTransaction]);
+        setShowAddTransactionModal(false);
+      })
+      .catch((error) => {
+        setErrorMsg("Failed to add transaction. Please try again.");
+      });
+  };
+
+  const handleDeleteTransaction = (transactionId) => {
+    deleteTransaction(splitId, transactionId)
+      .then(() => {
+        setTransactions((prev) => prev.filter((t) => t.id !== transactionId));
+      })
+      .catch((error) => {
+        setErrorMsg("Failed to delete transaction. Please try again.");
+      });
+  };
+
+  const handleFinalize = () => {
+    finalizeSplit(splitId)
+      .then(() => {
+        router.push("/split");
+      })
+      .catch((error) => {
+        setErrorMsg("Failed to finalize split. Please try again.");
+      });
+  };
+
+  if (!splitDetails) {
+    return (
+      <div className="flex h-screen bg-gray-100">
+        <Nav />
+        <main className="flex-1 p-8">
+          <h1 className="text-2xl mb-4">Loading split details...</h1>
+        </main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Style to make the Nav fixed */}
+
+      <Nav />
+
+      <main className="flex-1 p-8 h-screen overflow-y-auto">
+        {errorMsg && <p className="text-red-500 mb-4">{errorMsg}</p>}
+        <div>
+          <button onClick={() => router.back()}>&larr; Go Back</button>
+          {/* rest of your page content */}
+        </div>
+
+        <h1 className="text-2xl mb-4 font-bold">
+          Details for Split: {splitDetails.title}
+        </h1>
+
+        <div className="bg-white shadow-md rounded-lg p-4 mb-6 space-y-6">
+          <section>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Participants</h2>
+              <button
+                onClick={() => setShowAddUserModal(true)}
+                className={`${
+                  splitDetails.isFinalized
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-green-500 text-white"
+                } text-white rounded px-4 py-2`}
+                disabled={splitDetails.isFinalized}
+              >
+                Add User
+              </button>
+              {showAddUserModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+                  <div className="bg-white p-6 rounded-lg w-1/2 max-w-lg">
+                    <h2 className="text-2xl font-semibold mb-4">
+                      Add Users to Split
+                    </h2>
+                    <SearchUser
+                      onSelectUser={handleUserSelect}
+                      excludeUser={currentUser}
+                      excludeUsers={splitDetails.users.map((user) => user.id)}
+                    />
+                    <div className="mt-4">
+                      <h3 className="text-lg font-medium">Selected Users:</h3>
+                      <ul className="bg-gray-100 rounded-lg p-2 mt-2">
+                        {selectedUsers.map((user) => (
+                          <li
+                            key={user.id}
+                            className="flex justify-between items-center border-b border-gray-300 py-1"
+                          >
+                            {user.name}
+                            <span
+                              onClick={() => handleRemoveUser(user.id)}
+                              className="cursor-pointer px-2 py-1 rounded-full hover:bg-red-500 hover:text-white"
+                            >
+                              x
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="flex justify-end mt-6">
+                      <button
+                        onClick={handleAddUser}
+                        className="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      >
+                        Add
+                      </button>
+                      <button
+                        onClick={() => setShowAddUserModal(false)}
+                        className="ml-4 bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {splitDetails.users.map((user) => (
+                <div
+                  key={user.id}
+                  className="p-4 border rounded-lg cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                >
+                  <h3 className="text-lg font-medium mb-2">{user.name}</h3>
+                  {/* The debt can be displayed here. I'm adding a placeholder for now. */}
+                  {consolidatedDebts[user.name] && (
+                    <p className="text-sm text-gray-500">
+                      Debt: ₹ {consolidatedDebts[user.name]}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section>
+            {showAddTransactionModal && (
+              <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
+                <div className="relative bg-white p-4 rounded-md">
+                  {" "}
+                  {/* Added relative here for absolute positioning of close button */}
+                  <button
+                    onClick={() => setShowAddTransactionModal(false)}
+                    className="absolute top-2 right-2 text-xl font-bold cursor-pointer"
+                  >
+                    &times; {/* This is the "X" character */}
+                  </button>
+                  <h2 className="mb-4">Add Transaction</h2>
+                  <input
+                    type="date"
+                    value={newTransaction.date}
+                    onChange={(e) =>
+                      setNewTransaction((prev) => ({
+                        ...prev,
+                        date: e.target.value,
+                      }))
+                    }
+                    className="mb-2 p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Amount"
+                    value={newTransaction.amount}
+                    onChange={(e) =>
+                      setNewTransaction((prev) => ({
+                        ...prev,
+                        amount: e.target.value,
+                      }))
+                    }
+                    className="mb-2 p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Description"
+                    value={newTransaction.description}
+                    onChange={(e) =>
+                      setNewTransaction((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                    className="mb-2 p-2 border rounded"
+                  />
+                  <button onClick={handleAddTransaction}>Submit</button>
+                </div>
+              </div>
+            )}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Transactions</h2>
+              <button
+                onClick={() => setShowAddTransactionModal(true)}
+                className={`${
+                  splitDetails.isFinalized
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-blue-500 text-white"
+                } text-white rounded px-4 py-2`}
+                disabled={splitDetails.isFinalized}
+              >
+                Add Transaction
+              </button>
+            </div>
+            <table className="min-w-full bg-white shadow-md rounded-md overflow-hidden">
+              {" "}
+              {/* Styling for table */}
+              <thead>
+                <tr>
+                  <th className="text-left px-4 py-2">Date</th>
+                  <th className="text-left px-4 py-2">Type</th>
+                  <th className="text-left px-4 py-2">Amount</th>
+                  <th className="text-left px-4 py-2">Owner</th>{" "}
+                  {/* Added owner column */}
+                  <th className="px-4 py-2"></th> {/* For the delete button */}
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.length > 0 ? (
+                  transactions.slice(0, 10).map((transaction) => (
+                    <tr key={transaction.id} className="border-b">
+                      <td className="px-4 py-2">{transaction.date}</td>
+                      <td className="px-4 py-2">{transaction.type}</td>
+                      <td className="px-4 py-2">₹ {transaction.amount}</td>
+                      <td className="px-4 py-2">
+                        {transaction.user.name}
+                      </td>{" "}
+                      {/* Displaying owner's name */}
+                      {!splitDetails.isFinalized && (
+                        <td className="px-4 py-2 text-red-500 cursor-pointer">
+                          <TrashIcon
+                            className="w-5 h-5"
+                            onClick={() =>
+                              handleDeleteTransaction(transaction.id)
+                            }
+                          />
+                        </td>
+                      )}
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center py-4 text-gray-600">
+                      No transactions available for this split yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h2 className="text-xl mb-4 font-semibold">Debts</h2>
+            <div>
+              {debtSummary && debtSummary.length ? (
+                <DebtSummary debtData={debtSummary} />
+              ) : (
+                <p className="text-gray-600">No debt details available.</p>
+              )}
+            </div>
+          </section>
+
+          <section>
+            <button
+              onClick={handleFinalize}
+              className={`${
+                splitDetails.isFinalized
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-500 text-white"
+              } text-white rounded px-4 py-2 w-full`}
+              disabled={splitDetails.isFinalized}
+            >
+              Finalize Split
+            </button>
+          </section>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default SplitDetailPage;

@@ -14,7 +14,8 @@ function Nav() {
   return (
     <nav className="bg-slate-600 text-white w-1/6 p-2 flex flex-col justify-between">
       <div className="mb-4 basis-1/6 pt-14">
-        <div className="flex items-center justify-center mb-4">
+      <Link href="/dashboard">
+        <div className="flex items-center justify-center mb-4 cursor-pointer ">
           <Image
             src="/assets/images/logo.png"
             alt="Logo"
@@ -22,7 +23,9 @@ function Nav() {
             height={50}
           />
         </div>
+        </Link>
       </div>
+      
       <ul className="flex flex-col space-y-2 basis-4/6 justify-evenly ">
         <li>
           <Link href="/budget">

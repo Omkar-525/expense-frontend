@@ -3,6 +3,7 @@ import { Pie } from "react-chartjs-2";
 import Nav from "../../components/nav";
 import { getBudget, createBudget as apiCreateBudget } from "../../api/budget";
 import { getTransactions } from "../../api/transaction";
+import Layout from "../../components/Layout";
 
 const Budget = () => {
   const [budgetData, setBudgetData] = useState(null);
@@ -188,7 +189,7 @@ const Budget = () => {
                   Budget for {currentMonth}
                 </h2>
                 <p>
-                  Your budget is: Rs.
+                  Your budget is: ₹
                   {budgetData &&
                     budgetData.budget &&
                     budgetData.budget.budgetAmount}
@@ -284,6 +285,7 @@ const Budget = () => {
           </>
         )}
       </main>
+    
     </div>
   );
 };
