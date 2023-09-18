@@ -63,8 +63,8 @@ const AuthenticationForm = () => {
   },[])
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-1/3">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4 sm:px-0">
+      <div className="bg-white p-8 rounded shadow-md w-full sm:w-1/2 md:w-1/3">
         <div className="flex justify-center mb-4">
           <Image
             className="w-20 h-20 object-contain"

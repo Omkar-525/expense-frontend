@@ -20,6 +20,7 @@ const Transaction = () => {
     type: "",
     amount: "",
     category: "",
+    description:""
   });
 
   const router = useRouter();
@@ -208,6 +209,13 @@ const Transaction = () => {
                         placeholder="Amount"
                         className="mb-2 p-1 border rounded w-full"
                       />
+                      <input
+                        name="description"
+                        value={transactionData.description}
+                        onChange={handleInputChange}
+                        placeholder="description"
+                        className="mb-2 p-1 border rounded w-full"
+                      />
                       <select
                         name="category"
                         value={transactionData.category}
@@ -262,6 +270,12 @@ const Transaction = () => {
               </th>
               <th
                 className="cursor-pointer text-center p-2"
+              >
+                Description{" "}
+               
+              </th>
+              <th
+                className="cursor-pointer text-center p-2"
                 onClick={() => handleSort("category")}
               >
                 Category{" "}
@@ -292,6 +306,7 @@ const Transaction = () => {
                   {tx.date}
                 </td>
                 <td className="text-center p-2">₹ {tx.amount}</td>
+                <td className="text-center p-2"> {tx.description}</td>
                 <td className="text-center p-2">{tx.category}</td>
                 <td
                   className={`text-center p-2 ${
