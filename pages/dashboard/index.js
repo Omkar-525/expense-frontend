@@ -34,12 +34,12 @@ const DashboardLayout = ({ children }) => {
         new Date().getFullYear().toString();
       const token = localStorage.getItem("jwt");
       const currentUserId = localStorage.getItem("user").id; // Assuming you store userId in localStorage
-
+  
       if (!token) {
         router.push("/");
         return;
       }
-
+  
       axios
         .get("http://localhost:8080/user/dashboard", {
           headers: {
@@ -57,13 +57,27 @@ const DashboardLayout = ({ children }) => {
             owe: response.totalExpense.totalWeOwe,
           });
         });
-      getTransactions(token, currentMonth).then((data) => {
-        setTransactions(data.transactions.slice(0, 4));
-      });
+  
+      // Initialize transactions as an empty array
+      setTransactions([]);
+  
+      getTransactions(token, currentMonth)
+        .then((data) => {
+          // Ensure data.transactions is an array before using slice
+          if (Array.isArray(data.transactions)) {
+            setTransactions(data.transactions.slice(0, 5));
+          }
+        })
+        .catch((error) => {
+          // Handle any errors that might occur during the data fetch
+          console.error("Error fetching transactions:", error);
+        });
     };
-
+  
     fetchData();
   }, []);
+
+
 
   const pieChartData = {
     labels: ["Total Expenses", "Total Owed", "Total You Owe"],
@@ -111,7 +125,7 @@ const DashboardLayout = ({ children }) => {
           </div>
 
           <div className="col-span-2 p-6 bg-white shadow-lg rounded-lg">
-            <h2 className="text-xl text-center font-semibold mb-4">Recent Transactions</h2>
+            <h2 className="text-xl text-center font-semibold mb-4">Recent Debit Transactions</h2>
             <div className="bg-gray-100 p-4 rounded-md shadow-md">
               <ul>
                 {transactions.slice(0, 5).map((transaction, index) => (

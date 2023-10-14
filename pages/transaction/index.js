@@ -6,21 +6,23 @@ import {
   getAllTransactions,
   createTransaction,
   deleteTransaction,
+  getAllTransactionsWithoutMonth
 } from "../../api/transaction";
 import axios from "axios";
-import { TrashIcon } from '@heroicons/react/solid';
-
+import {SearchIcon, TrashIcon } from "@heroicons/react/solid";
 
 const Transaction = () => {
   const [transactions, setTransactions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+ 
   const [transactionData, setTransactionData] = useState({
     date: "",
     type: "",
     amount: "",
     category: "",
-    description:""
+    description: "",
   });
 
   const router = useRouter();
@@ -29,17 +31,28 @@ const Transaction = () => {
     new Date().toLocaleString("default", { month: "short" }).toUpperCase() +
     "-" +
     new Date().getFullYear().toString();
+    const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+
+    const handleMonthChange = (e) => {
+      setSelectedMonth(e.target.value);
+    };
 
   useEffect(() => {
     if (!localStorage.getItem("jwt")) {
       router.push("/");
     } else {
       const userToken = localStorage.getItem("jwt");
-      getAllTransactions(userToken, currentMonth).then((data) => {
+      if(selectedMonth === "ALL"){
+        getAllTransactionsWithoutMonth(userToken).then((data) => {
+          setTransactions(data.transactions);
+        });
+      } else {
+      getAllTransactions(userToken, selectedMonth).then((data) => {
         setTransactions(data.transactions);
       });
     }
-  }, []);
+    }
+  }, [selectedMonth]);
 
   useEffect(() => {
     axios.get("http://localhost:8080/category").then((response) => {
@@ -53,6 +66,13 @@ const Transaction = () => {
       [e.target.name]: e.target.value,
     }));
   };
+  const filteredTransactions = transactions.filter(tx => 
+    tx.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    tx.category.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    tx.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    tx.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    tx.amount == searchTerm
+  );
   const handleDelete = (transactionId) => {
     const userToken = localStorage.getItem("jwt");
 
@@ -125,7 +145,7 @@ const Transaction = () => {
     }
   };
 
-  const sortedTransactions = [...transactions].sort((a, b) => {
+  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
     if (a[sortKey] < b[sortKey]) return -1 * sortOrder;
     if (a[sortKey] > b[sortKey]) return 1 * sortOrder;
     return 0;
@@ -134,11 +154,29 @@ const Transaction = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       <Nav />
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 h-screen overflow-y-auto">
         <div className="mb-8 flex justify-between items-center">
-          <div></div>{" "}
-          {/* This empty div will take up space equivalent to the Add Transaction button */}
-          <h2 className="text-xl font-bold">Transactions</h2>
+        
+          <h1 className="text-xl font-bold">Transactions</h1  >
+          <div className="relative w-1/2 ">
+            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input 
+              type="text"
+              placeholder="Search transactions..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 w-full border rounded-md"
+            />
+          </div>
+          <select onChange={handleMonthChange} value={selectedMonth} className="mr-4 border rounded-md p-2">
+          <option value="ALL">All</option>
+          {Array.from({ length: 12 }, (_, i) => 
+            new Date(0, i).toLocaleString('en-US', { month: 'short' }).toUpperCase()
+          ).map(monthShort => {
+            const monthYear = `${monthShort}-${new Date().getFullYear()}`;
+            return <option key={monthYear} value={monthYear}>{monthYear}</option>
+          })}
+        </select>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onClick={() => setShowModal(true)}
@@ -235,7 +273,22 @@ const Transaction = () => {
                   <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <button
                       onClick={addTransaction}
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+                      className={
+                        !transactionData.date ||
+                        !transactionData.amount ||
+                        !transactionData.description ||
+                        !transactionData.category ||
+                        !transactionData.type
+                          ? " cursor-not-allowed w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+                          : "cursor w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+                      }
+                      disabled={
+                        !transactionData.date ||
+                        !transactionData.amount ||
+                        !transactionData.description ||
+                        !transactionData.category ||
+                        !transactionData.type
+                      }
                     >
                       Submit
                     </button>
@@ -269,11 +322,11 @@ const Transaction = () => {
                 Amount {sortKey === "amount" && (sortOrder === 1 ? "▲" : "▼")}
               </th>
               <th
-                className="cursor-pointer text-center p-2"
-              >
-                Description{" "}
-               
-              </th>
+              className="cursor-pointer text-center p-2"
+            >
+              Description{" "}
+             
+            </th>
               <th
                 className="cursor-pointer text-center p-2"
                 onClick={() => handleSort("category")}
@@ -331,7 +384,7 @@ const Transaction = () => {
         </table>
 
         {sortedTransactions.length === 0 && (
-          <p>There are no transactions for this month.</p>
+          <p className="text-center">There are no transactions for this month.</p>
         )}
       </main>
     </div>

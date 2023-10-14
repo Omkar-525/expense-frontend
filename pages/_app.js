@@ -1,20 +1,23 @@
 import '../styles/globals.css'
 import { useEffect, useState} from 'react'
 import Head from 'next/head'
-
+import FeedbackButton from "../components/feedback/index"
 
 
 function MyApp({ Component, pageProps }) {
-  <Head>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0"/>
-  </Head>
   useEffect(() => {
-    console.log("I am useeffect from app.js")
-  }, [])
+    console.log("I am useEffect from app.js");
+  }, []);
 
-  
-
-  return <><Component {...pageProps} /></>
+  return (
+    <>
+      <Head>
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0"/>
+      </Head>
+      <Component {...pageProps} />
+      <FeedbackButton googleFormLink="https://forms.gle/xVmV5pE3auy5iuHL6" />
+    </>
+  );
 }
 
 export default MyApp

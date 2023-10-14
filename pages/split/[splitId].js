@@ -57,14 +57,20 @@ const SplitDetailPage = () => {
   };
 
   const handleAddUser = () => {
+    if (selectedUsers.length === 0) {
+      alert("Please select at least one user before adding.");
+      return;
+    }
     if (selectedUsers.length) {
       const userIds = selectedUsers.map((user) => user.id);
       addUserToSplit(splitId, { userIds }) // assuming the API needs an object with a userIds property
         .then((response) => {
           if (response.response_code === "200") {
+            // alert("Transaction Added");
+            window.location.reload();
             setSelectedUsers([]); // clear selected users after adding
             setShowAddUserModal(false); // close modal after adding
-            window.location.reload();
+            
           }
         })
         .catch((error) => {
@@ -141,6 +147,10 @@ const SplitDetailPage = () => {
   }, [splitId]);
 
   const handleAddTransaction = () => {
+    if (!newTransaction.date || !newTransaction.amount || !newTransaction.description) {
+      alert("Please fill in all the fields before submitting.");
+      return;
+    }
     const dateObject = new Date(newTransaction.date);
     const formattedDate = `${String(dateObject.getDate()).padStart(
       2,
@@ -162,6 +172,7 @@ const SplitDetailPage = () => {
       .then((newTransaction) => {
         setTransactions((prev) => [...prev, newTransaction]);
         setShowAddTransactionModal(false);
+        window.location.reload();
       })
       .catch((error) => {
         setErrorMsg("Failed to add transaction. Please try again.");
@@ -265,6 +276,7 @@ const SplitDetailPage = () => {
                       <button
                         onClick={handleAddUser}
                         className="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                        disabled={!selectedUsers.length} // disable the button if no users are selected
                       >
                         Add
                       </button>
@@ -345,7 +357,16 @@ const SplitDetailPage = () => {
                     }
                     className="mb-2 p-2 border rounded"
                   />
-                  <button onClick={handleAddTransaction}>Submit</button>
+                  <button
+                    onClick={handleAddTransaction}
+                    disabled={
+                      !newTransaction.date ||
+                      !newTransaction.amount ||
+                      !newTransaction.description
+                    } // disable the button if any of the fields are empty
+                  >
+                    Submit
+                  </button>
                 </div>
               </div>
             )}

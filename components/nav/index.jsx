@@ -16,7 +16,7 @@ function Nav() {
     <>
       <nav className="bg-slate-600 text-white w-full sm:w-1/6 p-2 flex flex-col justify-between h-screen">
         <div className="mb-4 basis-1/6 pt-14">
-          <Link href="/dashboard">
+          <Link href="/dashboard" passHref={true}>
             <div className="flex items-center justify-center mb-4 cursor-pointer ">
               <Image
                 src="/assets/images/logo.png"
@@ -30,7 +30,7 @@ function Nav() {
 
         <ul className="flex flex-col space-y-2 basis-4/6 justify-evenly ">
           <li>
-            <Link href="/budget">
+            <Link href="/budget" passHref={true}>
               <a className="flex items-center justify-center p-1 hover:bg-gray-600 rounded">
                 Budget
                 <span className="w-4 h-4 mr-2">
@@ -53,7 +53,7 @@ function Nav() {
             </Link>
           </li>
           <li>
-            <Link href="/transaction">
+            <Link href="/transaction" passHref={true}>
               <a className="flex items-center justify-center p-1 hover:bg-gray-600 rounded">
                 Transaction
                 <span className="w-4 h-4 mr-2">
@@ -76,7 +76,7 @@ function Nav() {
             </Link>
           </li>
           <li>
-            <Link href="/split">
+            <Link href="/split" passHref={true}>
               <a className="flex items-center  justify-center p-1 hover:bg-gray-600 rounded">
                 Split
                 <span className="w-4 h-4 mr-2">
@@ -117,7 +117,7 @@ function Nav() {
             </span>
           </button>
           <div className="flex flex-col items-center space-y-1 invisible group-hover:visible">
-            <Link href="/profile">
+            <Link href="/profile" passHref={true}>
               <button className="p-1 hover:bg-gray-600 rounded">Profile</button>
             </Link>
             <button
@@ -132,7 +132,7 @@ function Nav() {
       {/* Mobile Bottom Navbar */}
       <div className="sm:hidden fixed bottom-0 w-full flex justify-between items-center bg-slate-600 p-4">
         <div>
-          <Link href="/dashboard">
+          <Link href="/dashboard" passHref={true}>
             <Image
               src="/assets/images/logo.png"
               alt="Logo"
@@ -146,7 +146,7 @@ function Nav() {
             Profile
           </button>
           <div className="flex flex-col items-center space-y-1 invisible group-hover:visible">
-            <Link href="/profile">
+            <Link href="/profile" passHref={true}>
               <button className="p-1 hover:bg-gray-600 rounded">Profile</button>
             </Link>
             <button
