@@ -106,38 +106,40 @@ const DashboardLayout = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       <Nav />
-      <main className="flex-1 p-8  overflow-y-auto">
+      <main className="flex-1 p-8 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-6 bg-white shadow-lg rounded-lg">
-            <h3 className="mb-4 text-lg text-center font-semibold">
+          <div className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <h3 className="mb-4 text-lg text-center font-semibold dark:text-gray-300">
               Monthly Expenses and Split Overview
             </h3>
             <Pie data={pieChartData} />
           </div>
 
-          <div className="p-6 bg-white shadow-lg rounded-lg">
-            <h3 className="mb-4 text-lg text-center font-semibold">
+          <div className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <h3 className="mb-4 text-lg text-center font-semibold dark:text-gray-300">
               Transactions per Month
             </h3>
             <Bar data={barChartData} />
           </div>
 
-          <div className="col-span-2 p-6 bg-white shadow-lg rounded-lg">
-            <h2 className="text-xl text-center font-semibold mb-4">Recent Debit Transactions</h2>
-            <div className="bg-gray-100 p-4 rounded-md shadow-md">
+          <div className="col-span-2 p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <h2 className="text-xl text-center font-semibold mb-4 dark:text-gray-300">
+              Recent Debit Transactions
+            </h2>
+            <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-md shadow-md">
               <ul>
                 {transactions.slice(0, 5).map((transaction, index) => (
                   <li
                     key={transaction.id}
-                    className={`grid grid-cols-3 gap-4 transform transition-all duration-500 ease-in-out opacity-80 translate-x-4 hover:opacity-100 hover:translate-x-0 bg-white p-4 rounded-md my-2 shadow-sm hover:shadow-md`}
+                    className={`grid grid-cols-3 gap-4 transform transition-all duration-500 ease-in-out opacity-80 translate-x-4 hover:opacity-100 hover:translate-x-0 bg-white dark:bg-gray-700 p-4 rounded-md my-2 shadow-sm hover:shadow-md dark:text-gray-300`}
                     style={{ transitionDelay: `${index * 100}ms` }}
                   >
-                    <span className="text-gray-600 font-medium">
+                    <span className="text-gray-600 dark:text-gray-400 font-medium">
                       {transaction.date}
                     </span>
-                    <span className="col-span-1 text-center">
+                    <span className="col-span-1 text-center dark:text-gray-400">
                       {transaction.description}
                     </span>
                     <div className="flex justify-between">
@@ -146,11 +148,11 @@ const DashboardLayout = ({ children }) => {
                           transaction.type === "DEBIT"
                             ? "text-red-500"
                             : "text-green-500"
-                        }`}
+                        } dark:text-gray-400`}
                       >
                         {transaction.type}
                       </span>
-                      <span>: ₹ {transaction.amount}</span>
+                      <span className="dark:text-gray-400">: ₹ {transaction.amount}</span>
                     </div>
                   </li>
                 ))}

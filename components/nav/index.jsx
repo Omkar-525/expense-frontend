@@ -1,10 +1,13 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { FaSun, FaRegMoon } from "react-icons/fa";
+import { useTheme } from "next-themes";
 
 function Nav() {
   const [showOverlay, setShowOverlay] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const router = useRouter();
   const handleLogout = () => {
@@ -14,15 +17,15 @@ function Nav() {
 
   return (
     <>
-      <nav className="bg-slate-600 text-white w-full sm:w-1/6 p-2 flex flex-col justify-between h-screen">
+      <nav className="bg-slate-600 dark:bg-gray-900 text-white dark:text-gray-300 w-full sm:w-1/6 p-2 flex flex-col justify-between justify-center items-center h-screen">
         <div className="mb-4 basis-1/6 pt-14">
           <Link href="/dashboard" passHref={true}>
             <div className="flex items-center justify-center mb-4 cursor-pointer ">
               <Image
-                src="/assets/images/logo.png"
+                src="/assets/images/llg.png"
                 alt="Logo"
-                width={50}
-                height={50}
+                width={75}
+                height={75}
               />
             </div>
           </Link>
@@ -31,7 +34,7 @@ function Nav() {
         <ul className="flex flex-col space-y-2 basis-4/6 justify-evenly ">
           <li>
             <Link href="/budget" passHref={true}>
-              <a className="flex items-center justify-center p-1 hover:bg-gray-600 rounded">
+              <a className="flex items-center justify-center p-1 hover:bg-gray-600 dark:hover:bg-gray-700 rounded">
                 Budget
                 <span className="w-4 h-4 mr-2">
                   <svg
@@ -54,7 +57,7 @@ function Nav() {
           </li>
           <li>
             <Link href="/transaction" passHref={true}>
-              <a className="flex items-center justify-center p-1 hover:bg-gray-600 rounded">
+              <a className="flex items-center justify-center p-1 hover:bg-gray-600 dark:hover:bg-gray-700 rounded">
                 Transaction
                 <span className="w-4 h-4 mr-2">
                   <svg
@@ -77,7 +80,7 @@ function Nav() {
           </li>
           <li>
             <Link href="/split" passHref={true}>
-              <a className="flex items-center  justify-center p-1 hover:bg-gray-600 rounded">
+              <a className="flex items-center justify-center p-1 hover:bg-gray-600 dark:hover:bg-gray-700 rounded">
                 Split
                 <span className="w-4 h-4 mr-2">
                   <svg
@@ -95,9 +98,10 @@ function Nav() {
             </Link>
           </li>
         </ul>
-
+        
         <div className="group flex flex-col">
-          <button className="flex items-center justify-center p-1 hover:bg-gray-600 rounded basis-1/6">
+          
+          <button className="flex items-center justify-center p-1 hover:bg-gray-600 dark:hover:bg-gray-700 rounded basis-1/6">
             Profile
             <span className="w-4 h-4 mr-2">
               <svg
@@ -118,16 +122,28 @@ function Nav() {
           </button>
           <div className="flex flex-col items-center space-y-1 invisible group-hover:visible">
             <Link href="/profile" passHref={true}>
-              <button className="p-1 hover:bg-gray-600 rounded">Profile</button>
+              <button className="p-1 hover:bg-gray-600 dark:hover:bg-gray-700 rounded">
+                Profile
+              </button>
             </Link>
             <button
-              className="p-1 hover:bg-gray-600 rounded"
+              className="p-1 hover:bg-gray-600 dark:hover:bg-gray-700 rounded"
               onClick={handleLogout}
             >
               Logout
             </button>
           </div>
         </div>
+        <button
+        className="block py-2 pl-3 pr-4 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 ease-in-out md:p-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      >
+        {theme === "dark" ? (
+          <FaSun className="text-yellow-500 text-xl" />
+        ) : (
+          <FaRegMoon className="text-xl text-gray-500 dark:text-white" />
+        )}
+      </button>
       </nav>
       {/* Mobile Bottom Navbar */}
       <div className="sm:hidden fixed bottom-0 w-full flex justify-between items-center bg-slate-600 p-4">
@@ -160,28 +176,27 @@ function Nav() {
         <button onClick={() => setShowOverlay(!showOverlay)}>Menu</button>
       </div>
 
-      {/* Overlay Menu */}
       {showOverlay && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-4 rounded">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded">
             <ul className="flex flex-col space-y-2">
               <li>
                 <Link href="/budget">
-                  <a className="flex items-center justify-center p-1 hover:bg-gray-600 rounded">
+                  <a className="flex items-center justify-center p-1 hover:bg-gray-600 dark:hover:bg-gray-700 rounded">
                     Budget
                   </a>
                 </Link>
               </li>
               <li>
                 <Link href="/transaction">
-                  <a className="flex items-center justify-center p-1 hover:bg-gray-600 rounded">
+                  <a className="flex items-center justify-center p-1 hover:bg-gray-600 dark:hover:bg-gray-700 rounded">
                     Transaction
                   </a>
                 </Link>
               </li>
               <li>
                 <Link href="/split">
-                  <a className="flex items-center justify-center p-1 hover:bg-gray-600 rounded">
+                  <a className="flex items-center justify-center p-1 hover:bg-gray-600 dark:hover:bg-gray-700 rounded">
                     Split
                   </a>
                 </Link>

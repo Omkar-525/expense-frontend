@@ -47,23 +47,25 @@ const Split = () => {
   ); // Filter splits based on search term
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       <Nav />
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 bg-gray-100 dark:bg-gray-900">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-semibold">My Splits</h1>
-          
-            <div className="relative  w-1/2">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search splits..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border rounded-md"
-              />
-            </div>
-          
+          <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-300">
+            My Splits
+          </h1>
+
+          <div className="relative w-1/2">
+            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search splits..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 w-full border rounded-md text-gray-900 dark:text-gray-300 dark:bg-gray-800"
+            />
+          </div>
+
           <button
             onClick={() => setModalOpen(true)}
             className="bg-teal-500 text-white px-8 py-2 rounded-full shadow-lg hover:bg-teal-600 transition-all"
@@ -78,11 +80,11 @@ const Split = () => {
             filteredSplits.map((split) => (
               <div
                 key={split.id}
-                className="p-5 bg-white shadow-md rounded-lg cursor-pointer hover:shadow-xl transition-shadow"
+                className="p-5 bg-white dark:bg-gray-800 shadow-md rounded-lg cursor-pointer hover:shadow-xl transition-shadow text-gray-900 dark:text-gray-300"
                 onClick={() => router.push(`/split/${split.id}`)}
               >
                 <h2 className="text-xl font-medium mb-4">{split.title}</h2>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                   Users:{" "}
                   {split.users
                     .slice(0, 3)

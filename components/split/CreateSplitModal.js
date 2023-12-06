@@ -44,21 +44,21 @@ const CreateSplitModal = ({ isOpen, onClose, onCreate }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg w-1/2 max-w-lg">
-        <h2 className="text-2xl font-semibold mb-4">Create a Split</h2>
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-1/2 max-w-lg">
+        <h2 className="text-2xl font-semibold mb-4 text-black dark:text-white">Create a Split</h2>
         <input 
             type="text" 
             placeholder="Enter Split Title" 
             value={title} 
             onChange={(e) => setTitle(e.target.value)} 
-            className="border p-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-teal-400 rounded-md"
+            className="border p-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-teal-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md"
         />
         <SearchUser onSelectUser={handleUserSelect} excludeUser={currentUser} />
         <div className="mt-4">
-          <h3 className="text-lg font-medium">Selected Users:</h3>
-          <ul className="bg-gray-100 rounded-lg p-2 mt-2">
+          <h3 className="text-lg font-medium text-black dark:text-white">Selected Users:</h3>
+          <ul className="bg-gray-100 dark:bg-gray-700 rounded-lg p-2 mt-2">
             {selectedUsers.map(user => (
-              <li key={user.id} className="flex justify-between items-center border-b border-gray-300 py-1">
+              <li key={user.id} className="flex justify-between items-center border-b border-gray-300 dark:border-gray-600 py-1 text-black dark:text-white">
                 {user.name}
                 <span 
                     onClick={() => handleRemoveUser(user.id)} 

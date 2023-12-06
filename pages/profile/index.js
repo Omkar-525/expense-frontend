@@ -16,7 +16,7 @@ const ProfilePage = () => {
   }, []);
 
   const handleChangePassword = async (e) => {
-    const token = localStorage.getItem('jwt');
+    const token = localStorage.getItem("jwt");
     e.preventDefault();
 
     if (newPassword !== confirmNewPassword) {
@@ -25,14 +25,16 @@ const ProfilePage = () => {
     }
 
     let postData = {
-        "oldPassword": currentPassword,
-        newPassword,
-      }
+      oldPassword: currentPassword,
+      newPassword,
+    };
     try {
       const response = await axios.post(
-        "http://localhost:8080/user/changepassword",postData, {
+        "http://localhost:8080/user/changepassword",
+        postData,
+        {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -50,19 +52,23 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       <Nav />
-      <main className="flex-1 p-8">
-        <h1 className="text-2xl font-bold mb-4">Profile</h1>
-        <div className="bg-white p-4 rounded shadow-md">
+      <main className="flex-1 p-8 bg-gray-100 dark:bg-gray-900">
+        <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+          Profile
+        </h1>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded shadow-md">
           <p>
-            <strong>Name:</strong> {user["name"]}
+            <strong className="text-gray-900 dark:text-gray-100">Name:</strong>{" "}
+            {user["name"]}
           </p>
           <p className="mt-2">
-            <strong>Email:</strong> {user["email"]}
+            <strong className="text-gray-900 dark:text-gray-100">Email:</strong>{" "}
+            {user["email"]}
           </p>
           <button
-            className="mt-4 text-blue-500"
+            className="mt-4 text-blue-500 hover:text-blue-700 dark:text-gray-300"
             onClick={() => setShowModal(true)}
           >
             Change Password
@@ -70,9 +76,11 @@ const ProfilePage = () => {
         </div>
 
         {showModal && (
-          <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h2 className="text-xl font-bold mb-4">Change Password</h2>
+          <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 dark:bg-opacity-50">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+              <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+                Change Password
+              </h2>
               <form onSubmit={handleChangePassword}>
                 <div className="mb-4">
                   <label className="block text-sm font-medium mb-2">

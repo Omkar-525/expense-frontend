@@ -50,7 +50,7 @@ const Budget = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [currentMonth]);
 
   const createBudget = () => {
     const userToken = localStorage.getItem("jwt");
@@ -115,23 +115,23 @@ const Budget = () => {
       };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       <Nav />
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
         {loading ? (
-          <div>Loading...</div>
+          <div className="text-gray-900 dark:text-gray-300">Loading...</div>
         ) : budgetData.budget ? (
           <>
             {showUpdateModal && (
               <div
-                className="fixed z-10 inset-0 overflow-y-auto"
+                className="fixed z-10 inset-0 overflow-y-auto dark:bg-gray-900"
                 aria-labelledby="modal-title"
                 role="dialog"
                 aria-modal="true"
               >
                 <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                   <div
-                    className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                    className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity dark:bg-opacity-50"
                     aria-hidden="true"
                   ></div>
                   <span
@@ -140,12 +140,12 @@ const Budget = () => {
                   >
                     &#8203;
                   </span>
-                  <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                       <div className="sm:flex sm:items-start">
                         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                           <h3
-                            className="text-lg leading-6 font-medium text-gray-900"
+                            className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-300"
                             id="modal-title"
                           >
                             Update Budget for {currentMonth}
@@ -156,13 +156,13 @@ const Budget = () => {
                               placeholder="Enter Updated Budget Amount"
                               value={budgetAmount}
                               onChange={(e) => setBudgetAmount(e.target.value)}
-                              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700"
                             />
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                       <button
                         onClick={createBudget}
                         type="button"
@@ -173,7 +173,7 @@ const Budget = () => {
                       <button
                         onClick={() => setShowUpdateModal(false)}
                         type="button"
-                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                       >
                         Cancel
                       </button>
@@ -184,51 +184,52 @@ const Budget = () => {
             )}
 
             <div className="mb-8 flex justify-between items-start">
-              <div>
-                <h2 className="text-xl font-bold mb-2">
-                  Budget for {currentMonth}
-                </h2>
-                <p>
-                  Your budget is: ₹
-                  {budgetData &&
-                    budgetData.budget &&
-                    budgetData.budget.budgetAmount}
-                </p>
-              </div>
-              <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                onClick={() => setShowUpdateModal(true)}
-              >
-                Update Budget
-              </button>
+            <div>
+              <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-gray-300">
+                Budget for {currentMonth}
+              </h2>
+              <p className="text-gray-900 dark:text-gray-300">
+                Your budget is: ₹
+                {budgetData &&
+                  budgetData.budget &&
+                  budgetData.budget.budgetAmount}
+              </p>
             </div>
-
-            <div className="mt-8">
-              <Pie data={pieData} />
-            </div>
-          </>
-        ) : (
-          <>
-          <div className= "flex justify-between items-start">
-            <p>You don't have a budget set for this month</p>
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={() => setShowModal(true)}
+              onClick={() => setShowUpdateModal(true)}
             >
-              Add
+              Update Budget
             </button>
+          </div>
+          <div className="mt-8">
+            <Pie data={pieData} />
+          </div>
+        </>
+      ) : (
+          <>
+            <div className="flex justify-between items-start">
+              <p className="text-gray-900 dark:text-gray-300">
+                You dont have a budget set for this month
+              </p>
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => setShowModal(true)}
+              >
+                Add Budget
+              </button>
             </div>
 
             {showModal && (
               <div
-                className="fixed z-10 inset-0 overflow-y-auto"
+                className="fixed z-10 inset-0 overflow-y-auto dark:bg-gray-900"
                 aria-labelledby="modal-title"
                 role="dialog"
                 aria-modal="true"
               >
                 <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                   <div
-                    className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                    className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity dark:bg-opacity-50"
                     aria-hidden="true"
                   ></div>
 
@@ -239,12 +240,12 @@ const Budget = () => {
                     &#8203;
                   </span>
 
-                  <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                       <div className="sm:flex sm:items-start">
                         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                           <h3
-                            className="text-lg leading-6 font-medium text-gray-900"
+                            className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-300"
                             id="modal-title"
                           >
                             Set Budget for {currentMonth}
@@ -255,13 +256,13 @@ const Budget = () => {
                               placeholder="Enter Budget Amount"
                               value={budgetAmount}
                               onChange={(e) => setBudgetAmount(e.target.value)}
-                              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700"
                             />
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                       <button
                         onClick={createBudget}
                         type="button"
@@ -272,7 +273,7 @@ const Budget = () => {
                       <button
                         onClick={() => setShowModal(false)}
                         type="button"
-                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                       >
                         Cancel
                       </button>
@@ -281,11 +282,9 @@ const Budget = () => {
                 </div>
               </div>
             )}
-          
           </>
         )}
       </main>
-    
     </div>
   );
 };

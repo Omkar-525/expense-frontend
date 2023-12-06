@@ -70,7 +70,6 @@ const SplitDetailPage = () => {
             window.location.reload();
             setSelectedUsers([]); // clear selected users after adding
             setShowAddUserModal(false); // close modal after adding
-            
           }
         })
         .catch((error) => {
@@ -147,7 +146,11 @@ const SplitDetailPage = () => {
   }, [splitId]);
 
   const handleAddTransaction = () => {
-    if (!newTransaction.date || !newTransaction.amount || !newTransaction.description) {
+    if (
+      !newTransaction.date ||
+      !newTransaction.amount ||
+      !newTransaction.description
+    ) {
       alert("Please fill in all the fields before submitting.");
       return;
     }
@@ -201,17 +204,19 @@ const SplitDetailPage = () => {
 
   if (!splitDetails) {
     return (
-      <div className="flex h-screen bg-gray-100">
+      <div className="flex h-screen bg-gray-100 dark:bg-gray-800">
         <Nav />
         <main className="flex-1 p-8">
-          <h1 className="text-2xl mb-4">Loading split details...</h1>
+          <h1 className="text-2xl mb-4 text-black dark:text-white">
+            Loading split details...
+          </h1>
         </main>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-800">
       {/* Style to make the Nav fixed */}
 
       <Nav />
@@ -223,14 +228,17 @@ const SplitDetailPage = () => {
           {/* rest of your page content */}
         </div>
 
-        <h1 className="text-2xl mb-4 font-bold">
+        <h1 className="text-2xl mb-4 font-bold text-black dark:text-white">
           Details for Split: {splitDetails.title}
         </h1>
 
-        <div className="bg-white shadow-md rounded-lg p-4 mb-6 space-y-6">
+        <div className="bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 mb-6 space-y-6">
           <section>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Participants</h2>
+              <h2 className="text-xl font-semibold text-black dark:text-white">
+                Participants
+              </h2>
+
               <button
                 onClick={() => setShowAddUserModal(true)}
                 className={`${
@@ -244,8 +252,8 @@ const SplitDetailPage = () => {
               </button>
               {showAddUserModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-                  <div className="bg-white p-6 rounded-lg w-1/2 max-w-lg">
-                    <h2 className="text-2xl font-semibold mb-4">
+                  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-1/2 max-w-lg">
+                    <h2 className="text-2xl font-semibold mb-4 text-black dark:text-white">
                       Add Users to Split
                     </h2>
                     <SearchUser
@@ -254,12 +262,14 @@ const SplitDetailPage = () => {
                       excludeUsers={splitDetails.users.map((user) => user.id)}
                     />
                     <div className="mt-4">
-                      <h3 className="text-lg font-medium">Selected Users:</h3>
-                      <ul className="bg-gray-100 rounded-lg p-2 mt-2">
+                      <h3 className="text-lg font-medium text-black dark:text-white">
+                        Selected Users:
+                      </h3>
+                      <ul className="bg-gray-100 dark:bg-gray-700 rounded-lg p-2 mt-2">
                         {selectedUsers.map((user) => (
                           <li
                             key={user.id}
-                            className="flex justify-between items-center border-b border-gray-300 py-1"
+                            className="flex justify-between items-center border-b border-gray-300 dark:border-gray-600 py-1"
                           >
                             {user.name}
                             <span
@@ -276,7 +286,7 @@ const SplitDetailPage = () => {
                       <button
                         onClick={handleAddUser}
                         className="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                        disabled={!selectedUsers.length} // disable the button if no users are selected
+                        disabled={!selectedUsers.length}
                       >
                         Add
                       </button>
@@ -291,85 +301,76 @@ const SplitDetailPage = () => {
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {splitDetails.users.map((user) => (
-                <div
-                  key={user.id}
-                  className="p-4 border rounded-lg cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
-                >
-                  <h3 className="text-lg font-medium mb-2">{user.name}</h3>
-                  {/* The debt can be displayed here. I'm adding a placeholder for now. */}
-                  {consolidatedDebts[user.name] && (
-                    <p className="text-sm text-gray-500">
-                      Debt: ₹ {consolidatedDebts[user.name]}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
           </section>
 
           <section>
             {showAddTransactionModal && (
-              <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
-                <div className="relative bg-white p-4 rounded-md">
-                  {" "}
-                  {/* Added relative here for absolute positioning of close button */}
+              <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-1/2 max-w-lg relative">
+                  {/* Close button */}
                   <button
                     onClick={() => setShowAddTransactionModal(false)}
-                    className="absolute top-2 right-2 text-xl font-bold cursor-pointer"
+                    className="absolute top-2 right-2 text-xl font-bold cursor-pointer text-black dark:text-white"
                   >
                     &times; {/* This is the "X" character */}
                   </button>
-                  <h2 className="mb-4">Add Transaction</h2>
-                  <input
-                    type="date"
-                    value={newTransaction.date}
-                    onChange={(e) =>
-                      setNewTransaction((prev) => ({
-                        ...prev,
-                        date: e.target.value,
-                      }))
-                    }
-                    className="mb-2 p-2 border rounded"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Amount"
-                    value={newTransaction.amount}
-                    onChange={(e) =>
-                      setNewTransaction((prev) => ({
-                        ...prev,
-                        amount: e.target.value,
-                      }))
-                    }
-                    className="mb-2 p-2 border rounded"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Description"
-                    value={newTransaction.description}
-                    onChange={(e) =>
-                      setNewTransaction((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                    className="mb-2 p-2 border rounded"
-                  />
-                  <button
-                    onClick={handleAddTransaction}
-                    disabled={
-                      !newTransaction.date ||
-                      !newTransaction.amount ||
-                      !newTransaction.description
-                    } // disable the button if any of the fields are empty
-                  >
-                    Submit
-                  </button>
+
+                  <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">
+                    Add Transactions
+                  </h2>
+
+                  <div className="space-y-4">
+                    <input
+                      type="date"
+                      value={newTransaction.date}
+                      onChange={(e) =>
+                        setNewTransaction((prev) => ({
+                          ...prev,
+                          date: e.target.value,
+                        }))
+                      }
+                      className="mb-2 p-2 border rounded w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Amount"
+                      value={newTransaction.amount}
+                      onChange={(e) =>
+                        setNewTransaction((prev) => ({
+                          ...prev,
+                          amount: e.target.value,
+                        }))
+                      }
+                      className="mb-2 p-2 border rounded w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Description"
+                      value={newTransaction.description}
+                      onChange={(e) =>
+                        setNewTransaction((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      className="mb-2 p-2 border rounded w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <button
+                      onClick={handleAddTransaction}
+                      disabled={
+                        !newTransaction.date ||
+                        !newTransaction.amount ||
+                        !newTransaction.description
+                      } // disable the button if any of the fields are empty
+                      className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                    >
+                      Submit
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
+
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Transactions</h2>
               <button
@@ -384,7 +385,7 @@ const SplitDetailPage = () => {
                 Add Transaction
               </button>
             </div>
-            <table className="min-w-full bg-white shadow-md rounded-md overflow-hidden">
+            <table className="min-w-full bg-white dark:bg-gray-700 shadow-md rounded-md overflow-hidden">
               {" "}
               {/* Styling for table */}
               <thead>
@@ -432,14 +433,16 @@ const SplitDetailPage = () => {
           </section>
 
           <section>
-            <h2 className="text-xl mb-4 font-semibold">Debts</h2>
-            <div>
-              {debtSummary && debtSummary.length ? (
-                <DebtSummary debtData={debtSummary} />
-              ) : (
-                <p className="text-gray-600">No debt details available.</p>
-              )}
-            </div>
+          <h2 className="text-xl mb-4 font-semibold text-black dark:text-white">
+          Debts
+        </h2>
+        <div className="bg-white dark:bg-gray-800 p-4 border dark:border-gray-600 rounded-md">
+          {debtSummary && debtSummary.length ? (
+            <DebtSummary debtData={debtSummary} />
+          ) : (
+            <p className="text-gray-600 dark:text-gray-400">No debt details available.</p>
+          )}
+        </div>
           </section>
 
           <section>
